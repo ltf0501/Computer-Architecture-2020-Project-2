@@ -40,6 +40,9 @@ integer            i, j;
 // Write Data      
 // 1. Write hit
 // 2. Read miss: Read from memory
+assign hit_tmp[0] = (tag[addr_i][0][22:0] == tag_i[22:0] && tag[addr_i][0][24]) ? 1 : 0;
+assign hit_tmp[1] = (tag[addr_i][1][22:0] == tag_i[22:0] && tag[addr_i][1][24]) ? 1 : 0;
+
 always@(posedge clk_i or posedge rst_i) begin
     if (rst_i) begin
         for (i=0;i<16;i=i+1) begin
@@ -51,17 +54,19 @@ always@(posedge clk_i or posedge rst_i) begin
 				pos <= 16'b0;
     end
     if (enable_i && write_i) begin
-			// TODO: Handle your write of 2-way associative cache + LRU here
-			tag[addr_i][pos[addr_i]] <= tag_i;
-			data[addr_i][pos[addr_i]] <= data_i;
-			pos[addr_i] = pos[addr_i] ^ 1;
+			// TODO: Handle your write of 2-way associative cache + LRU here 
+			if (hit_tmp[0] == 1) pos[addr_i] = 1;
+			else if (hit_tmp[1] == 1) pos[addr_i] = 0;
+			else begin
+				tag[addr_i][pos[addr_i]] <= tag_i;
+				data[addr_i][pos[addr_i]] <= data_i;
+				pos[addr_i] = pos[addr_i] ^ 1;
+			end
     end
 end
 
 // Read Data      
 // TODO: tag_o=? data_o=? hit_o=?
-assign hit_tmp[0] = (tag[addr_i][0][22:0] == tag_i[22:0] && tag[addr_i][0][24]) ? 1 : 0;
-assign hit_tmp[1] = (tag[addr_i][1][22:0] == tag_i[22:0] && tag[addr_i][1][24]) ? 1 : 0;
 assign hit_o = hit_tmp[0] | hit_tmp[1];
 
 
