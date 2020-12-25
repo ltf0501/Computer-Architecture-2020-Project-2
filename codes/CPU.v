@@ -319,20 +319,28 @@ dcache_controller dcache (
 	.rst_i (rst_i),
 
 	// to Data Memory interface        
-	.mem_data_i (), 
-	.mem_ack_i (),     
-	.mem_data_o (), 
-	.mem_addr_o (),     
-	.mem_enable_o (), 
-	.mem_write_o (), 
+	.mem_data_i (mem_data_i), 
+	.mem_ack_i (mem_ack_i),     
+	.mem_data_o (mem_data_o), 
+	.mem_addr_o (mem_addr_o),     
+	.mem_enable_o (mem_enable_o), 
+	.mem_write_o (mem_write_o), 
 
 	// to CPU interface    
-	.cpu_data_i (), 
-	.cpu_addr_i (),     
-	.cpu_MemRead_i (), 
-	.cpu_MemWrite_i (), 
-	.cpu_data_o (), 
+	.cpu_data_i (MEM_write_data), 
+	.cpu_addr_i (MEM_ALU_result),     
+	.cpu_MemRead_i (MEM_mem_read), 
+	.cpu_MemWrite_i (MEM_mem_write), 
+	.cpu_data_o (MEM_read_data), 
 	.cpu_stall_o ()
 );
 
+//Data_Memory Data_Memory(
+//	.clk_i (clk_i), 
+//	.addr_i (MEM_ALU_result), 
+//	.MemRead_i (MEM_mem_read),
+//	.MemWrite_i (MEM_mem_write),
+//	.data_i (MEM_write_data),
+//	.data_o (MEM_read_data)
+//);
 endmodule 
