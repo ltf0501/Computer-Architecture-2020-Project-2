@@ -313,7 +313,7 @@ MEM_WB MEM_WB(
 	.RDaddr_o (WB_rd)
 );
 
-dcache_controller dcache_controller (
+dcache_controller dcache (
 	// System clock, reset and stall
 	.clk_i (clk_i), 
 	.rst_i (rst_i),
