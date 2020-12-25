@@ -1,11 +1,25 @@
 module CPU
 (
-    clk_i, 
-    start_i,
-	rst_i
+	clk_i, 
+	rst_i,
+	start_i,
+
+	mem_data_i, 
+	mem_ack_i,
+	mem_data_o,
+	mem_addr_o,
+	mem_enable_o,
+	mem_write_o
 );
 
 input clk_i, start_i, rst_i;
+
+input [255 : 0] mem_data_i;
+input mem_ack_i;
+output [255 : 0] mem_data_o;
+output [31 : 0] mem_addr_o;
+output mem_enable_o;
+output mem_write_o;
 
 wire [31 : 0] IF_pc_in;
 wire [31 : 0] IF_pc_out;
@@ -82,15 +96,6 @@ PC PC(
 Instruction_Memory Instruction_Memory(
 	.addr_i (IF_pc_out),
 	.instr_o (IF_instruction)
-);
-
-Data_Memory Data_Memory(
-	.clk_i (clk_i), 
-	.addr_i (MEM_ALU_result), 
-	.MemRead_i (MEM_mem_read),
-	.MemWrite_i (MEM_mem_write),
-	.data_i (MEM_write_data),
-	.data_o (MEM_read_data)
 );
 
 And And(
@@ -306,6 +311,28 @@ MEM_WB MEM_WB(
 
 	.RDaddr_i (MEM_rd),
 	.RDaddr_o (WB_rd)
+);
+
+dcache_controller dcache_controller (
+	// System clock, reset and stall
+	.clk_i (clk_i), 
+	.rst_i (rst_i),
+
+	// to Data Memory interface        
+	.mem_data_i (), 
+	.mem_ack_i (),     
+	.mem_data_o (), 
+	.mem_addr_o (),     
+	.mem_enable_o (), 
+	.mem_write_o (), 
+
+	// to CPU interface    
+	.cpu_data_i (), 
+	.cpu_addr_i (),     
+	.cpu_MemRead_i (), 
+	.cpu_MemWrite_i (), 
+	.cpu_data_o (), 
+	.cpu_stall_o ()
 );
 
 endmodule 
