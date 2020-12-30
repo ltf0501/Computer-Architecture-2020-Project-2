@@ -55,10 +55,18 @@ always@(posedge clk_i or posedge rst_i) begin
     end
     if (enable_i && write_i) begin
 			// TODO: Handle your write of 2-way associative cache + LRU here 
-			if (hit_tmp[0] == 1) pos[addr_i] = 1;
-			else if (hit_tmp[1] == 1) pos[addr_i] = 0;
+			if (hit_tmp[0] == 1) begin
+				tag[addr_i][0] <= tag_i | {2'b11, 23'b0};
+				data[addr_i][0] <= data_i;
+				pos[addr_i] = 1;
+			end
+			else if (hit_tmp[1] == 1) begin 
+				tag[addr_i][1] <= tag_i | {2'b11, 23'b0};
+				data[addr_i][1] <= data_i;
+				pos[addr_i] = 0;
+			end
 			else begin
-				tag[addr_i][pos[addr_i]] <= tag_i;
+				tag[addr_i][pos[addr_i]] <= tag_i | {2'b11, 23'b0};
 				data[addr_i][pos[addr_i]] <= data_i;
 				pos[addr_i] = pos[addr_i] ^ 1;
 			end
@@ -69,16 +77,12 @@ end
 // TODO: tag_o=? data_o=? hit_o=?
 assign hit_o = hit_tmp[0] | hit_tmp[1];
 
-
-assign hit_o = ((tag[addr_i][0][22:0] == tag_i[22:0] && tag[addr_i][0][24]) 
-						 || (tag[addr_i][1][22:0] == tag_i[22:0] && tag[addr_i][1][24])) ? 1 : 0;
-
 assign data_o = !enable_i ? 256'b0 : (
-								hit_tmp[0] ? data[addr_i][0] : (hit_tmp[1] ? data[addr_i][1] : 256'b0)
+								hit_tmp[0] ? data[addr_i][0] : (hit_tmp[1] ? data[addr_i][1] : data[addr_i][pos[addr_i]])
 								);
 
-assign data_o = !enable_i ? 25'b0 : (
-								hit_tmp[0] ? tag[addr_i][0] : (hit_tmp[1] ? tag[addr_i][1] : 25'b0)
+assign tag_o = !enable_i ? 25'b0 : (
+								hit_tmp[0] ? tag[addr_i][0] : (hit_tmp[1] ? tag[addr_i][1] : tag[addr_i][pos[addr_i]])
 								);
 								
 endmodule
