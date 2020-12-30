@@ -2,6 +2,8 @@ module MEM_WB(
 	clk_i,
 	start_i,
 
+	stall_i,
+
 	RegWrite_i,
 	RegWrite_o,
 	MemtoReg_i,
@@ -16,7 +18,7 @@ module MEM_WB(
 	RDaddr_o
 );
 
-input clk_i, start_i;
+input clk_i, start_i, stall_i;
 
 input RegWrite_i, MemtoReg_i;
 output reg RegWrite_o, MemtoReg_o;
@@ -36,11 +38,13 @@ always @(posedge clk_i or negedge start_i) begin
 		RDaddr_o <= 0;
 	end
 	else begin
-		RegWrite_o <= RegWrite_i;
-		MemtoReg_o <= MemtoReg_i;
-		ALU_o <= ALU_i;
-		MemReadData_o <= MemReadData_i;
-		RDaddr_o <= RDaddr_i;
+		if (!stall_i) begin
+			RegWrite_o <= RegWrite_i;
+			MemtoReg_o <= MemtoReg_i;
+			ALU_o <= ALU_i;
+			MemReadData_o <= MemReadData_i;
+			RDaddr_o <= RDaddr_i;
+		end
 	end
 end
 

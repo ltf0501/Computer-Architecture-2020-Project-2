@@ -2,6 +2,8 @@ module EX_MEM(
 	clk_i,
 	start_i,
 
+	stall_i,
+
 	RegWrite_i,
 	RegWrite_o,
 	MemtoReg_i,
@@ -21,7 +23,7 @@ module EX_MEM(
 	RDaddr_o,
 );
 
-input clk_i, start_i;
+input clk_i, start_i, stall_i;
 
 input RegWrite_i, MemtoReg_i, MemRead_i, MemWrite_i;
 output reg RegWrite_o, MemtoReg_o, MemRead_o, MemWrite_o;
@@ -46,13 +48,15 @@ always @(posedge clk_i or negedge start_i) begin
 		RDaddr_o <= 0;
 	end
 	else begin
-		RegWrite_o <= RegWrite_i;
-		MemtoReg_o <= MemtoReg_i;
-		MemRead_o <= MemRead_i;
-		MemWrite_o <= MemWrite_i;
-		ALU_o <= ALU_i;
-		MemWriteData_o <= MemWriteData_i;
-		RDaddr_o <= RDaddr_i;
+		if (!stall_i) begin
+			RegWrite_o <= RegWrite_i;
+			MemtoReg_o <= MemtoReg_i;
+			MemRead_o <= MemRead_i;
+			MemWrite_o <= MemWrite_i;
+			ALU_o <= ALU_i;
+			MemWriteData_o <= MemWriteData_i;
+			RDaddr_o <= RDaddr_i;
+		end
 	end
 end
 

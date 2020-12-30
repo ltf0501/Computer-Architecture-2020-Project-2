@@ -21,6 +21,8 @@ output [31 : 0] mem_addr_o;
 output mem_enable_o;
 output mem_write_o;
 
+wire mem_stall;
+
 wire [31 : 0] IF_pc_in;
 wire [31 : 0] IF_pc_out;
 wire [31 : 0] IF_pc_add_out;
@@ -88,6 +90,7 @@ PC PC(
 	.clk_i (clk_i),
 	.rst_i (rst_i),
 	.start_i (start_i),
+	.stall_i (mem_stall),
 	.PCWrite_i (pc_write),
 	.pc_i (IF_pc_in),
 	.pc_o (IF_pc_out)
@@ -200,7 +203,7 @@ MUX3 MUX3B(
 IF_ID IF_ID(
 	.clk_i (clk_i),
 	.start_i (start_i),
-	.Stall_i (Stall),
+	.Stall_i (Stall | mem_stall),
 	.Flush_i (Flush),
 	.PC_i (IF_pc_out),
 	.PC_o (ID_add_in2),
@@ -211,6 +214,8 @@ IF_ID IF_ID(
 ID_EX ID_EX(
 	.clk_i (clk_i),
 	.start_i (start_i),
+
+	.stall_i (mem_stall),
 
 	.instr_i ({ID_instruction[31 : 25], ID_instruction[14 : 12]}),
 	.instr_o (EX_ALU_ctrl_in),
@@ -247,6 +252,8 @@ ID_EX ID_EX(
 EX_MEM EX_MEM(
 	.clk_i (clk_i),
 	.start_i (start_i),
+
+	.stall_i (mem_stall),
 
 	.RegWrite_i (EX_reg_write),
 	.RegWrite_o (MEM_reg_write),
@@ -299,6 +306,8 @@ MEM_WB MEM_WB(
 	.clk_i (clk_i),
 	.start_i (start_i),
 
+	.stall_i (mem_stall),
+
 	.RegWrite_i (MEM_reg_write),
 	.RegWrite_o (WB_reg_write),
 	.MemtoReg_i (MEM_memto_reg),
@@ -332,7 +341,7 @@ dcache_controller dcache (
 	.cpu_MemRead_i (MEM_mem_read), 
 	.cpu_MemWrite_i (MEM_mem_write), 
 	.cpu_data_o (MEM_read_data), 
-	.cpu_stall_o ()
+	.cpu_stall_o (mem_stall)
 );
 
 //Data_Memory Data_Memory(
