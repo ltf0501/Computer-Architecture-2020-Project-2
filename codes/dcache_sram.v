@@ -77,12 +77,8 @@ end
 // TODO: tag_o=? data_o=? hit_o=?
 assign hit_o = hit_tmp[0] | hit_tmp[1];
 
-assign data_o = !enable_i ? 256'b0 : (
-								hit_tmp[0] ? data[addr_i][0] : (hit_tmp[1] ? data[addr_i][1] : data[addr_i][pos[addr_i]])
-								);
+assign data_o = hit_tmp[0] ? data[addr_i][0] : (hit_tmp[1] ? data[addr_i][1] : data[addr_i][pos[addr_i]]);
 
-assign tag_o = !enable_i ? 25'b0 : (
-								hit_tmp[0] ? tag[addr_i][0] : (hit_tmp[1] ? tag[addr_i][1] : tag[addr_i][pos[addr_i]])
-								);
+assign tag_o = hit_tmp[0] ? tag[addr_i][0] : (hit_tmp[1] ? tag[addr_i][1] : tag[addr_i][pos[addr_i]]);
 								
 endmodule

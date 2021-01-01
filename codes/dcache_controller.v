@@ -134,7 +134,7 @@ always@(cpu_offset or r_hit_data or cpu_data_i) begin
     // TODO: add your code here! (w_hit_data=...?)
 		w_hit_data = r_hit_data;
 		for (i = 0; i < 32; i++) begin
-			w_hit_data[(cpu_offset >> 2) * 32 + i] = cpu_data[i];
+			w_hit_data[(cpu_offset >> 2) * 32 + i] = cpu_data_i[i];
 		end
 end
 
